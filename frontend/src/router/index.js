@@ -1,60 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import WelcomeView from '@/views/WelcomeView.vue'
+import { useAuthStore } from '@/modules/auth/stores/auth'
+import welcomeRoutes from '@/modules/welcome/routes.js'
+import authRoutes from '@/modules/auth/routes.js'
+import dashboardRoutes from '@/modules/dashboard/routes.js'
+import usersRoutes from '@/modules/users/routes.js'
+import showcaseRoutes from '@/modules/showcase/routes.js'
 
 const routes = [
-  {
-    path: '/',
-    name: 'welcome',
-    component: WelcomeView,
-    meta: { title: '', public: true, layout: 'blank' },
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('@/views/LoginView.vue'),
-    meta: { title: 'Login', public: true, layout: 'auth' },
-  },
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: () => import('@/views/DashboardView.vue'),
-    meta: { title: 'Dashboard', layout: 'default' },
-  },
-  {
-    path: '/users',
-    name: 'users',
-    component: () => import('@/views/users/UserListView.vue'),
-    meta: { title: 'Daftar Users', layout: 'default' },
-  },
-  {
-    path: '/users/create',
-    name: 'user-create',
-    component: () => import('@/views/users/UserCreateView.vue'),
-    meta: { title: 'Tambah User', layout: 'default' },
-  },
-  {
-    path: '/users/:id(\\d+)',
-    name: 'user-detail',
-    component: () => import('@/views/users/UserDetailView.vue'),
-    meta: { title: 'Detail User', layout: 'default' },
-  },
-  {
-    path: '/showcase',
-    name: 'showcase',
-    component: () => import('@/views/ShowcaseView.vue'),
-    meta: { title: 'Component Gallery', layout: 'default' },
-  },
+  ...welcomeRoutes,
+  ...authRoutes,
+  ...dashboardRoutes,
+  ...usersRoutes,
+  ...showcaseRoutes,
   {
     path: '/500',
     name: 'server-error',
-    component: () => import('@/components/errors/ServerErrorView.vue'),
+    component: () => import('@/shared/components/errors/ServerErrorView.vue'),
     meta: { title: 'Server Error', public: true, layout: 'blank' },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: () => import('@/components/errors/NotFoundView.vue'),
+    component: () => import('@/shared/components/errors/NotFoundView.vue'),
     meta: { title: '404', public: true, layout: 'blank' },
   },
 ]

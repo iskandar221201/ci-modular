@@ -5,8 +5,8 @@ import 'flowbite'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
-import { errorHandler } from '@/utils/errorHandler'
-import { useAuthStore } from '@/stores/auth'
+import { errorHandler } from '@/shared/utils/errorHandler'
+import { useAuthStore } from '@/modules/auth/stores/auth'
 
 const app = createApp(App)
 const pinia = createPinia()
