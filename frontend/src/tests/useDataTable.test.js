@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { nextTick } from 'vue'
-import { useDataTable } from '@/composables/useDataTable'
-import api from '@/services/api'
+import { useDataTable } from '@/shared/composables/useDataTable'
+import api from '@/shared/services/api'
 
-vi.mock('@/services/api', () => ({
+vi.mock('@/shared/services/api', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),

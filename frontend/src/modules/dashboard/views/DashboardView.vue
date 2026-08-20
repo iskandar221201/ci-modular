@@ -1,5 +1,5 @@
 <script setup>
-import PageHeader from '@/components/ui/PageHeader.vue'
+import PageHeader from '@/shared/components/ui/PageHeader.vue'
 
 const breadcrumbs = [{ label: 'Dashboard' }]
 </script>

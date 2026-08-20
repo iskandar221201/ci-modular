@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted } from 'vue'
-import PageHeader from '@/components/ui/PageHeader.vue'
-import SearchBar from '@/components/ui/SearchBar.vue'
-import DataTable from '@/components/ui/DataTable.vue'
-import { useDataTable } from '@/composables/useDataTable'
+import PageHeader from '@/shared/components/ui/PageHeader.vue'
+import SearchBar from '@/shared/components/ui/SearchBar.vue'
+import DataTable from '@/shared/components/ui/DataTable.vue'
+import { useDataTable } from '@/shared/composables/useDataTable'
 
 const breadcrumbs = [{ label: 'Dashboard', url: '/dashboard' }, { label: 'Users' }]
 const action = { label: 'Tambah User', url: '/users/create' }
