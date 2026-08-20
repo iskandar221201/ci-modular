@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Traits\AuditTrailTrait;
+use App\Shared\Traits\AuditTrailTrait;
 use PHPUnit\Framework\TestCase;
 
 class AuditTrailTraitTest extends TestCase

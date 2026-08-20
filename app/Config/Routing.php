@@ -7,16 +7,17 @@ use CodeIgniter\Config\Routing as BaseRouting;
 /**
  * Routing configuration
  *
- * Routes are split into per-module files under app/Routers/<module>/routes.php.
- * Folders use a numeric prefix to control load order (first match wins),
- * so the SPA catch-all (90-spa) always loads last.
+ * Routes are split into per-module files under app/Modules/<Module>/Routes.php.
+ * Module files load in sorted order; the SPA catch-all (90-spa) is appended
+ * last so it always wins on non-API GET requests.
  */
 class Routing extends BaseRouting
 {
     /**
      * For Defined Routes.
-     * Auto-discovered from app/Routers/<module>/routes.php, sorted by
-     * folder name so the numeric prefix controls load order.
+     * Auto-discovered from app/Modules/<Module>/Routes.php (sorted so module
+     * load order is deterministic), then app/Routers/90-spa/routes.php is
+     * appended LAST so the SPA catch-all always wins on non-API GET requests.
      *
      * @var list<string>
      */
@@ -26,8 +27,13 @@ class Routing extends BaseRouting
     {
         parent::__construct();
 
-        $files = glob(APPPATH . 'Routers/*/routes.php') ?: [];
+        $files = glob(APPPATH . 'Modules/*/Routes.php') ?: [];
         sort($files, SORT_NATURAL);
+
+        $spaRoutes = APPPATH . 'Routers/90-spa/routes.php';
+        if (is_file($spaRoutes)) {
+            $files[] = $spaRoutes;
+        }
 
         $this->routeFiles = $files;
     }

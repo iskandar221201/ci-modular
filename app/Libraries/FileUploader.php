@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-use App\Contracts\StorageDriverInterface;
+use App\Libraries\Storage\StorageDriverInterface;
 use App\Libraries\Storage\LocalDriver;
 use CodeIgniter\HTTP\Files\UploadedFile;
 

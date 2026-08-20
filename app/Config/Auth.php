@@ -25,7 +25,7 @@ use CodeIgniter\Shield\Authentication\Passwords\DictionaryValidator;
 use CodeIgniter\Shield\Authentication\Passwords\NothingPersonalValidator;
 use CodeIgniter\Shield\Authentication\Passwords\PwnedValidator;
 use CodeIgniter\Shield\Authentication\Passwords\ValidatorInterface;
-use App\Models\UserModel;
+use App\Modules\Users\Models\UserModel;
 
 class Auth extends ShieldAuth
 {

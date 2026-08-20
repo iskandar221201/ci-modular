@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-use App\Traits\LoggableTrait;
+use App\Shared\Traits\LoggableTrait;
 
 /**
  * AppLogger — static facade for LoggableTrait.

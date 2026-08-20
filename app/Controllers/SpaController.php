@@ -5,7 +5,7 @@ namespace App\Controllers;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class SpaController extends BaseController
+class SpaController extends \App\Shared\Controllers\BaseController
 {
     public function index(): ResponseInterface
     {

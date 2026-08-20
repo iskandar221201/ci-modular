@@ -136,3 +136,7 @@ _modules/*
 
 /results/
 /phpunit.xml
+
+# Local SQLite verification database
+/writable/*.sqlite
+/writable/*.sqlite-*
