@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@/composables/useForm'
+import { useForm } from '@/shared/composables/useForm'
 
 const props = defineProps({
   endpoint: { type: String, required: true },

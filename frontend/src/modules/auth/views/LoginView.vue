@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useAuth } from '@/modules/auth/composables/useAuth'
 
 const appName = import.meta.env.VITE_APP_NAME || 'CI4 Kit'
-const auth = useAuthStore()
+const auth = useAuth()
 const router = useRouter()
 
 const email = ref('')

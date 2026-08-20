@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { useCurrencyInput } from '@/composables/useCurrencyInput'
+import { useCurrencyInput } from '@/shared/composables/useCurrencyInput'
 
 const props = defineProps({
   name: { type: String, default: '' },

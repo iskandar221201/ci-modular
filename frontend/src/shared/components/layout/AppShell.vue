@@ -1,8 +1,8 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { useSidebar } from '@/composables/useSidebar'
-import Sidebar from '@/components/layout/Sidebar.vue'
-import Navbar from '@/components/layout/Navbar.vue'
+import { useSidebar } from '@/shared/composables/useSidebar'
+import Sidebar from '@/shared/components/layout/Sidebar.vue'
+import Navbar from '@/shared/components/layout/Navbar.vue'
 
 const { sidebarOpen, close } = useSidebar()
 

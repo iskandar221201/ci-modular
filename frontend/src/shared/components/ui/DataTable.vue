@@ -1,6 +1,6 @@
 <script setup>
-import EmptyState from '@/components/ui/EmptyState.vue'
-import Skeleton from '@/components/ui/Skeleton.vue'
+import EmptyState from '@/shared/components/ui/EmptyState.vue'
+import Skeleton from '@/shared/components/ui/Skeleton.vue'
 
 defineProps({
   columns: { type: Array, required: true },

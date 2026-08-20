@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import * as Tus from 'tus-js-client'
-import { useToastStore } from '@/stores/toast'
+import { useToastStore } from '@/shared/stores/toast'
 
 export function useTusUpload(options = {}) {
   const file = ref(null)

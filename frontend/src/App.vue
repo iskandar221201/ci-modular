@@ -2,10 +2,10 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
-import AppShell from '@/components/layout/AppShell.vue'
-import AuthLayout from '@/components/layout/AuthLayout.vue'
-import ErrorToast from '@/components/ui/ErrorToast.vue'
-import { pageTitle } from '@/utils/meta'
+import AppShell from '@/shared/components/layout/AppShell.vue'
+import AuthLayout from '@/shared/components/layout/AuthLayout.vue'
+import ErrorToast from '@/shared/components/ui/ErrorToast.vue'
+import { pageTitle } from '@/shared/utils/meta'
 
 const route = useRoute()
 const layout = computed(() => route.meta.layout || 'default')

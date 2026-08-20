@@ -1,5 +1,5 @@
 <script setup>
-import { useSidebar } from '@/composables/useSidebar'
+import { useSidebar } from '@/shared/composables/useSidebar'
 
 const appName = import.meta.env.VITE_APP_NAME || 'CI4 Kit'
 const appVersion = import.meta.env.VITE_APP_VERSION || '1.0.0'

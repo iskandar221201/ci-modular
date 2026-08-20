@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { authApi } from '@/modules/auth/services/authApi'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({ user: null, fetchedMe: false }),
@@ -9,13 +9,13 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async login({ email, password }) {
-      const res = await api.post('/auth/login', { email, password })
+      const res = await authApi.login(email, password)
       this.user = { id: res.data.id, username: res.data.username, email: res.data.email }
       return res
     },
     async fetchMe() {
       try {
-        const res = await api.get('/auth/me')
+        const res = await authApi.me()
         this.user = res.data
       } catch (_e) {
         this.user = null
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       try {
         // ponytail: empty body so axios keeps Content-Type: application/json (JsonBodyFilter)
-        await api.post('/auth/logout', {})
+        await authApi.logout()
       } catch (_e) {
         /* cookie cleared server-side regardless */
       }

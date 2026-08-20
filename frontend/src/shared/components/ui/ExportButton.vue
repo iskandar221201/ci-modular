@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { usePdfExport } from '@/composables/usePdfExport'
+import { usePdfExport } from '@/shared/composables/usePdfExport'
 
 const props = defineProps({
   endpoint: { type: String, required: true },

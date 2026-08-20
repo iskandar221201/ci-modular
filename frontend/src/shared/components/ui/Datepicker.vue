@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useDatepicker } from '@/composables/useDatepicker'
+import { useDatepicker } from '@/shared/composables/useDatepicker'
 
 const props = defineProps({
   name: { type: String, default: '' },

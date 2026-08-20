@@ -1,4 +1,4 @@
-import { useToastStore } from '@/stores/toast'
+import { useToastStore } from '@/shared/stores/toast'
 
 export async function usePdfExport(endpoint, params = {}) {
   const query = new URLSearchParams(params).toString()

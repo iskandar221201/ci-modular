@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import api from '@/services/api'
+import api from '@/shared/services/api'
 import router from '@/router'
 
 export function useForm(endpoint, method = 'POST', redirectUrl = null) {

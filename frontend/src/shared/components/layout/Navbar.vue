@@ -1,10 +1,10 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useSidebar } from '@/composables/useSidebar'
+import { useAuth } from '@/modules/auth/composables/useAuth'
+import { useSidebar } from '@/shared/composables/useSidebar'
 
 const router = useRouter()
-const auth = useAuthStore()
+const auth = useAuth()
 const { toggle } = useSidebar()
 
 async function logout() {

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-import api from '@/services/api'
-import { useToastStore } from '@/stores/toast'
+import api from '@/shared/services/api'
+import { useToastStore } from '@/shared/stores/toast'
 
 export function useDataTable(endpoint, perPage = 10) {
   const data = ref([])
