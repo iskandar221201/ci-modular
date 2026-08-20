@@ -2,7 +2,7 @@
 
 namespace App\Libraries\Storage;
 
-use App\Contracts\StorageDriverInterface;
+use App\Libraries\Storage\StorageDriverInterface;
 
 class LocalDriver implements StorageDriverInterface
 {

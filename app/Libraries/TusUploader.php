@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Libraries;
 
-use App\Contracts\StorageDriverInterface;
+use App\Libraries\Storage\StorageDriverInterface;
 use App\Libraries\Storage\LocalDriver;
 use Config\TusConfig;
 use CodeIgniter\HTTP\RequestInterface;

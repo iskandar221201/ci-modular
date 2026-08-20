@@ -246,35 +246,61 @@ app/
 ├── Config/
 │   ├── AppConstants.php      # HTTP status codes, pagination caps, and app-wide constants
 │   ├── Filters.php           # Filter aliases and route bindings
-│   ├── Routing.php           # Route file discovery (auto-globs app/Routers/*/routes.php)
+│   ├── Routing.php           # Route discovery (auto-globs app/Modules/*/Routes.php + SPA last)
 │   ├── SSOConfig.php         # SSO toggle + RSA key config
 │   ├── TusConfig.php         # TUS upload dir, max size, expiry
 │   └── WsConfig.php          # WebSocket host, port, enabled, secret
-├── Routers/                  # Per-module route files (numeric prefix = load order)
-│   ├── 10-auth/routes.php    # api/auth/* — login (public), logout/me (protected)
-│   ├── 20-users/routes.php   # api/users CRUD
-│   ├── 30-upload/routes.php  # api/upload/tus — chunked upload
-│   ├── 40-ping/routes.php    # api/ping (public) + api/protected
-│   └── 90-spa/routes.php     # SPA catch-all — MUST load last
+├── Modules/                 # Domain business — one folder per module (folder by feature)
+│   ├── Auth/
+│   │   ├── Controllers/AuthController.php      # Login, logout, me endpoints
+│   │   ├── Services/AuthService.php            # Credential verification + token issuance
+│   │   ├── Transformers/AuthTransformer.php    # Shapes auth responses
+│   │   └── Routes.php                          # api/auth/* routes
+│   ├── Users/               # Full CRUD — reference implementation
+│   │   ├── Client/UserClient.php               # Implements the module contract
+│   │   ├── Config/Services.php                 # Registers UserClient
+│   │   ├── Contracts/UserClientInterface.php   # Public API for other modules
+│   │   ├── Controllers/UserController.php      # CRUD endpoints
+│   │   ├── Models/UserModel.php                # Extends Shield's UserModel
+│   │   ├── Services/UserService.php            # Internal — not directly accessible
+│   │   ├── Transformers/UserTransformer.php    # Whitelist field projection
+│   │   └── Routes.php                          # api/users CRUD routes
+│   ├── Ping/                 # Health check — minimal module example
+│   │   ├── Controllers/PingController.php      # ping (public) + protected endpoints
+│   │   └── Routes.php
+│   └── Upload/               # TUS chunked upload — minimal module
+│       ├── Controllers/TusController.php       # TUS protocol handler
+│       └── Routes.php                          # api/upload/tus routes
+├── Shared/                  # Base classes & traits — not domain
+│   ├── Controllers/
+│   │   ├── BaseController.php          # Base for all controllers (traits wired here)
+│   │   └── BaseApiController.php       # Forces JSON response, populates $apiUser
+│   ├── Models/
+│   │   ├── BaseModel.php               # Timestamps, soft delete, search/dateRange scopes
+│   │   └── AuditLogModel.php           # Audit log persistence
+│   ├── Services/
+│   │   └── BaseService.php             # CRUD + pagination + validation wiring
+│   ├── Transformers/
+│   │   └── BaseTransformer.php         # item()/collection()/only()/except()
+│   ├── Traits/
+│   │   ├── ApiResponseTrait.php        # success(), error(), created(), paginate(), noContent()
+│   │   ├── AuditTrailTrait.php         # auditCreate(), auditUpdate(), auditDelete(), auditRestore()
+│   │   ├── LoggableTrait.php           # logInfo(), logWarning(), logError() with JSON payload
+│   │   └── QueryScopesTrait.php        # search(), dateRange(), active()
+│   ├── Validation/
+│   │   └── BaseValidator.php           # Thin wrapper around CI4 Validation service
+│   └── Exceptions/
+│       ├── ServiceException.php        # General service-layer exception
+│       └── ValidationException.php     # Wraps validation errors (422)
 ├── Controllers/
-│   ├── BaseController.php    # Base for all controllers (traits wired here)
-│   ├── Api/
-│   │   ├── BaseApiController.php   # Forces JSON response, populates $apiUser
-│   │   ├── AuthController.php      # Token-based login endpoint
-│   │   ├── PingController.php      # Health check endpoints
-│   │   ├── TusController.php       # TUS protocol handler
-│   │   └── UserController.php      # Full CRUD reference implementation
-│   └── SpaController.php     # Serves the Vue SPA (frontend/dist/index.html)
-├── Exceptions/
-│   ├── ServiceException.php        # General service-layer exception
-│   └── ValidationException.php     # Wraps validation errors (422)
-├── Filters/
+│   └── SpaController.php     # Serves the Vue SPA (frontend/dist/index.html) — not domain
+├── Filters/                  # HTTP layer — flat (domain-agnostic infrastructure)
 │   ├── ApiKeyFilter.php      # Validates Bearer token via Shield AccessTokens
 │   ├── AuthFilter.php        # Session auth guard for web routes
 │   ├── CorsFilter.php        # CORS headers + OPTIONS preflight
 │   ├── JsonBodyFilter.php    # Rejects non-JSON bodies on POST/PUT/PATCH
 │   └── SSOFilter.php         # JWT Bearer token verification for SSO
-├── Libraries/
+├── Libraries/                # Infrastructure tools — flat
 │   ├── AppLogger.php         # Static facade for structured JSON logging
 │   ├── BasePdfExporter.php   # Abstract base for PDF export via mPDF
 │   ├── FileUploader.php      # Standardized upload handler for module files
@@ -283,36 +309,33 @@ app/
 │   ├── WsPublisher.php       # HTTP publisher from CI4 to Ratchet server
 │   ├── WsServer.php          # Ratchet WebSocket server wrapper
 │   └── Storage/
+│       ├── StorageDriverInterface.php   # Storage driver contract (put/delete/url)
 │       ├── LocalDriver.php   # Default local filesystem storage driver
 │       └── S3Driver.php      # Optional S3-compatible storage driver
-├── Models/
-│   ├── BaseModel.php         # Timestamps, soft delete, search/dateRange scopes
-│   └── UserModel.php         # Extends Shield's UserModel + QueryScopesTrait
-├── Services/
-│   ├── BaseService.php       # CRUD + pagination + validation wiring
-│   └── UserService.php       # User resource — full reference implementation
-├── Traits/
-│   ├── ApiResponseTrait.php  # success(), error(), created(), paginate(), noContent()
-│   ├── AuditTrailTrait.php   # auditCreate(), auditUpdate(), auditDelete(), auditRestore()
-│   ├── LoggableTrait.php     # logInfo(), logWarning(), logError() with JSON payload
-│   └── QueryScopesTrait.php  # search(), dateRange(), active()
-├── Transformers/
-│   └── BaseTransformer.php   # Abstract base for sanitizing and shaping API payloads
-├── Validation/
-│   └── BaseValidator.php     # Thin wrapper around CI4 Validation service
 └── Views/
     ├── errors/               # CI4 native error pages (fatal fallback)
     └── exports/              # PDF export templates — plain HTML, no layout
+
+_stubs/                       # Scaffold templates — not runtime code
+├── Client/StubClient.php
+├── Config/Services.php
+├── Contracts/StubClientInterface.php
+├── Controllers/StubController.php
+├── Models/StubModel.php
+├── Services/StubService.php
+├── Transformers/StubTransformer.php
+└── Routes.php
 
 frontend/                     # Vue 3 SPA (Vite + Vue Router + Pinia + Tailwind)
 ├── src/
 │   ├── main.js               # App bootstrap — fetchMe() before mount, error hooks
 │   ├── App.vue               # Layout switcher (default/auth/blank) + global toast
-│   ├── router/index.js       # Routes + auth guard (lazy-loaded views)
+│   ├── router/index.js       # Routes + auth guard (lazy-loaded views) — aggregator
 │   ├── services/api.js       # Axios instance — withCredentials, envelope unwrap
 │   ├── stores/
 │   │   ├── auth.js           # Pinia auth store (cookie-based, no localStorage)
 │   │   └── toast.js          # Pinia global toast
+│   ├── modules/              # Mirror of app/Modules/ — folder by feature
 │   ├── composables/          # useDataTable, useForm, useConfirmDialog, useTusUpload, …
 │   ├── components/
 │   │   ├── layout/           # AppShell, AuthLayout, Sidebar, Navbar
@@ -329,30 +352,37 @@ frontend/                     # Vue 3 SPA (Vite + Vue Router + Pinia + Tailwind)
 
 ## Routing
 
-Routes are split into **per-module files** under `app/Routers/<module>/routes.php` instead of a single `app/Config/Routes.php`. This keeps routing organized as the app grows — one folder per feature.
+Routes are split into **per-module files** under `app/Modules/<Module>/Routes.php` instead of a single `app/Config/Routes.php`. This keeps routing organized as the app grows — one folder per feature.
 
 ### How it works
 
-`app/Config/Routing.php` overrides `$routeFiles` and auto-discovers `app/Routers/*/routes.php`, sorting by folder name. Files load in sorted order and the **first match wins**, so the numeric prefix controls precedence:
-
-- `10`–`40` — API routes (order between them is irrelevant).
-- `90-spa` — the `(.*)` catch-all, **always last** so it never shadows an API route.
+`app/Config/Routing.php` overrides `$routeFiles` and auto-discovers `app/Modules/*/Routes.php`, sorting the module files alphabetically. The SPA catch-all lives in `app/Routers/90-spa/routes.php` and is appended **last** so it never shadows an API route.
 
 The `$routes` variable is injected into each file's scope by the framework — it is a `RouteCollection`, not a plain array.
 
 ### Adding a module
 
-Create a folder with a numeric prefix and drop in a `routes.php` — no central file to edit:
+Use the scaffold command (recommended) or create the folder by hand:
+
+```bash
+php spark make:module Posts            # Controller, Model, Service, Transformer, Routes
+php spark make:module Posts --contract  # + Client, Contracts, Config/Services + forward
+php spark make:module Posts --minimal   # Controller + Routes only
+```
+
+The command also registers the module namespace in `app/Config/Autoload.php` (and forwards the client service in `app/Config/Services.php` for `--contract`).
+
+Manual route file:
 
 ```php
-// app/Routers/60-posts/routes.php
+// app/Modules/Posts/Routes.php
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
 $routes->group('api', ['filter' => 'apiKeyFilter'], static function (RouteCollection $routes): void {
-    $routes->get('posts', 'Api\PostController::index');
-    $routes->post('posts', 'Api\PostController::create');
+    $routes->get('posts', 'App\Modules\Posts\Controllers\PostController::index');
+    $routes->post('posts', 'App\Modules\Posts\Controllers\PostController::create');
 });
 ```
 
@@ -681,17 +711,23 @@ When `WS_ENABLED=false`, `WsPublisher::publish()` is a silent no-op.
 ## How to Add a New Resource
 
 ```bash
-# 1. Migration
+# 1. Scaffold the module (recommended)
+php spark make:module Posts            # full module
+php spark make:module Posts --contract  # + client/contract layer
+php spark make:module Posts --minimal   # controller + routes only
+
+# 2. Migration
 php spark make:migration CreatePostsTable && php spark migrate
 
-# 2. Model — app/Models/PostModel.php
-# 3. Service — app/Services/PostService.php
-# 4. API Controller — app/Controllers/Api/PostController.php
-# 5. Vue view — frontend/src/views/posts/PostListView.vue
-# 6. Add routes — app/Routers/60-posts/routes.php (see Routing)
+# 3. Wire up the service/model/transformer in app/Modules/Posts/  (see generated stubs)
+
+# 4. Vue view — frontend/src/modules/posts/PostListView.vue
+# 5. Verify routes — php spark routes
 ```
 
-See `UserService.php` and `UserController.php` for complete reference implementation.
+See `app/Modules/Users/` for the complete reference implementation (Controller, Model, Service, Transformer, Contract, Client) and `app/Modules/Ping/` for the minimal module example.
+
+To expose a module to other modules, add a `Contracts/` interface + `Client/` implementation (or use `--contract`), then resolve via the central service: `service('userClient')` (forwarded from `app/Config/Services.php`).
 
 ---
 

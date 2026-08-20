@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use App\Modules\Users\Contracts\UserClientInterface;
 
 /**
  * Services Configuration file.
@@ -19,14 +20,18 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
-    /*
-     * public static function example($getShared = true)
-     * {
-     *     if ($getShared) {
-     *         return static::getSharedInstance('example');
-     *     }
-     *
-     *     return new \CodeIgniter\Example();
-     * }
+    /**
+     * Forward to the Users module's service registration so module consumers
+     * resolve the UserClient via the central Services layer.
      */
+    public static function userClient(bool $getShared = true): UserClientInterface
+    {
+        return \App\Modules\Users\Config\Services::userClient($getShared);
+    }
+
+
+    public static function postClient(bool $getShared = true): \App\Modules\Posts\Contracts\PostClientInterface
+    {
+        return \App\Modules\Posts\Config\Services::postClient($getShared);
+    }
 }
