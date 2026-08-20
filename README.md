@@ -330,17 +330,32 @@ frontend/                     # Vue 3 SPA (Vite + Vue Router + Pinia + Tailwind)
 ├── src/
 │   ├── main.js               # App bootstrap — fetchMe() before mount, error hooks
 │   ├── App.vue               # Layout switcher (default/auth/blank) + global toast
-│   ├── router/index.js       # Routes + auth guard (lazy-loaded views) — aggregator
-│   ├── services/api.js       # Axios instance — withCredentials, envelope unwrap
-│   ├── stores/
-│   │   ├── auth.js           # Pinia auth store (cookie-based, no localStorage)
-│   │   └── toast.js          # Pinia global toast
-│   ├── modules/              # Mirror of app/Modules/ — folder by feature
-│   ├── composables/          # useDataTable, useForm, useConfirmDialog, useTusUpload, …
-│   ├── components/
-│   │   ├── layout/           # AppShell, AuthLayout, Sidebar, Navbar
-│   │   └── ui/               # PageHeader, DataTable, Badge, Datepicker, …
-│   └── views/                # Welcome, Login, Dashboard, Showcase, users/*
+│   ├── router/index.js       # Router + auth guard — aggregates module route files
+│   ├── shared/               # Cross-module code — not domain (mirror of app/Shared/)
+│   │   ├── components/
+│   │   │   ├── errors/       # NotFoundView, ServerErrorView
+│   │   │   ├── layout/       # AppShell, AuthLayout, Sidebar, Navbar
+│   │   │   └── ui/           # PageHeader, DataTable, Badge, Datepicker, Skeleton, …
+│   │   ├── composables/      # useDataTable, useForm, useConfirmDialog, useTusUpload, …
+│   │   ├── services/
+│   │   │   └── api.js        # Axios instance — withCredentials, envelope unwrap
+│   │   ├── stores/
+│   │   │   └── toast.js      # Pinia global toast
+│   │   └── utils/            # errorHandler, meta (page titles)
+│   ├── modules/              # Mirror of app/Modules/ — one folder per feature
+│   │   ├── auth/             # Login — routes, store, service, composable, view
+│   │   ├── users/            # Full CRUD — routes, store, service, UserForm, views
+│   │   ├── dashboard/        # routes.js + DashboardView
+│   │   ├── showcase/         # routes.js + ShowcaseView
+│   │   └── welcome/          # routes.js + WelcomeView
+│   │   # Each module owns its own:
+│   │   #   routes.js         # Vue Router routes, merged in router/index.js
+│   │   #   services/*Api.js  # Axios calls for that module
+│   │   #   stores/*.js       # Pinia store for that module
+│   │   #   composables/      # Feature logic (e.g. useUsers)
+│   │   #   components/       # Module-scoped components (e.g. UserForm)
+│   │   #   views/            # Page components (lazy-loaded per route)
+│   └── tests/                # Vitest unit tests (setup.js, useDataTable.test.js)
 ├── vite.config.js            # base /dist/, outDir ../public/dist, @/ alias
 ├── tailwind.config.js        # content glob + flowbite plugin
 └── package.json              # npm deps + dev/build/lint/test/analyze scripts
@@ -606,7 +621,7 @@ Vue composable:
 
 ```vue
 <script setup>
-import { useTusUpload } from '@/composables/useTusUpload'
+import { useTusUpload } from '@/shared/composables/useTusUpload'
 const { progress, isUploading, isComplete, result, start } = useTusUpload({
   endpoint: '/api/upload/tus',
 })
@@ -721,7 +736,9 @@ php spark make:migration CreatePostsTable && php spark migrate
 
 # 3. Wire up the service/model/transformer in app/Modules/Posts/  (see generated stubs)
 
-# 4. Vue view — frontend/src/modules/posts/PostListView.vue
+# 4. Frontend module — frontend/src/modules/posts/ with its own
+#    routes.js (imported in router/index.js), views/, store, and API service.
+#    See frontend/src/modules/users/ for the reference FE module.
 # 5. Verify routes — php spark routes
 ```
 
