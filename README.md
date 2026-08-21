@@ -93,6 +93,24 @@ Hook failures are non-blocking — they log and never break the main operation. 
 
 ---
 
+## Architecture enforcement
+
+[Deptrac](https://github.com/qossmic/deptrac) enforces module boundary rules statically.
+
+```bash
+composer analyse
+```
+
+Rules:
+- Modules may NOT import from another module's internal layers (Services, Models, Controllers, Transformers, Client).
+- Cross-module access must go through `Contracts/` interfaces only.
+- `Shared/` and `Libraries/` are accessible from any layer.
+
+Violations are reported by file and line number. New violations fail the command.
+Known pre-existing violations are recorded in `deptrac.baseline.xml`.
+
+---
+
 ## Dev workflow
 
 ```bash

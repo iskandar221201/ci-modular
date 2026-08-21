@@ -140,3 +140,4 @@ _modules/*
 # Local SQLite verification database
 /writable/*.sqlite
 /writable/*.sqlite-*
+\n# Deptrac\n.deptrac.cache
