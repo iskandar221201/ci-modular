@@ -136,3 +136,4 @@ _modules/*
 /writable/*.sqlite
 /writable/*.sqlite-*
 \n# Deptrac\n.deptrac.cache
+.deptrac.cache
