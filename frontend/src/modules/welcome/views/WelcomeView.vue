@@ -18,12 +18,12 @@
       <span
         class="mono"
         style="font-size: 14px; font-weight: 500; color: #111827; letter-spacing: -0.01em"
-        >ci4-kit</span
+        >ci-modular</span
       >
       <div style="display: flex; align-items: center; gap: 16px">
         <span class="badge"><span class="badge-dot"></span>v1.0.0 stable</span>
         <a
-          href="https://github.com/iskandar221201/codeigniter4-kit"
+          href="https://github.com/iskandar221201/ci-modular"
           target="_blank"
           class="btn-primary"
           style="padding: 7px 16px; font-size: 13px"
@@ -50,7 +50,7 @@
           margin-bottom: 20px;
         "
       >
-        CodeIgniter 4 · PHP 8.2+ · Vue 3 SPA
+        CI4 Modular Monolith · Folder-by-Feature · CI4 + Vue 3 SPA
       </p>
       <h1
         style="
@@ -62,7 +62,7 @@
           margin-bottom: 20px;
         "
       >
-        Production-grade architecture,<br />ready on day one.
+        Modular monolith,<br />ready on day one.
       </h1>
       <p
         style="
@@ -73,9 +73,10 @@
           margin-bottom: 36px;
         "
       >
-        A batteries-included CI4 starter kit with layered architecture, Shield authentication,
-        structured logging, and a Vue 3 SPA frontend with httpOnly cookie auth — built from a year
-        of production experience.
+        Folder-by-feature on both sides — <span class="mono" style="font-size: 13px; color: #374151">app/Modules/Posts</span> mirrors
+        <span class="mono" style="font-size: 13px; color: #374151">frontend/src/modules/posts</span>.
+        One folder per feature, Contracts for cross-module access, Deptrac-enforced boundaries. Forked from
+        ci4-kit, upgraded to full-stack modular.
       </p>
       <div style="display: flex; gap: 12px; flex-wrap: wrap">
         <router-link to="/login" class="btn-primary">
@@ -98,7 +99,54 @@
     <!-- Architecture -->
     <section style="max-width: 760px; margin: 0 auto; padding: 0 32px 64px">
       <hr class="divider" style="margin-bottom: 40px" />
-      <p class="feature-label" style="margin-bottom: 20px">Architecture</p>
+      <p class="feature-label" style="margin-bottom: 20px">Architecture — folder-by-feature</p>
+
+      <!-- BE/FE mirror -->
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 16px;
+          font-size: 12px;
+        "
+      >
+        <div
+          style="
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px 16px;
+          "
+        >
+          <div class="mono" style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 8px">
+            app/Modules/Posts/
+          </div>
+          <div class="mono" style="font-size: 12px; color: #374151; line-height: 1.7">
+            Controllers/<br />Services/<br />Models/<br />Transformers/<br />Contracts/ + Client/<br />Routes.php
+          </div>
+        </div>
+        <div
+          style="
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px 16px;
+          "
+        >
+          <div class="mono" style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 8px">
+            frontend/src/modules/posts/
+          </div>
+          <div class="mono" style="font-size: 12px; color: #374151; line-height: 1.7">
+            views/<br />stores/<br />services/<br />composables/<br />routes.js
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #6b7280; line-height: 1.6; margin-bottom: 24px">
+        Adding a feature = adding a folder. Removing it = deleting a folder. Cross-module access
+        only via <span class="mono" style="font-size: 12px; background: #f3f4f6; padding: 1px 6px; border-radius: 4px">service('userClient')</span>
+        Contracts — Deptrac blocks direct Service/Model imports.
+      </p>
 
       <div style="background: #111827; border-radius: 8px; padding: 20px 24px; margin-bottom: 32px">
         <div
@@ -160,36 +208,34 @@
 
       <div>
         <div class="layer-row">
-          <span class="layer-name">Vue SPA</span>
+          <span class="layer-name">Modules</span>
           <span class="layer-desc"
-            >Client-rendered UI with Vue Router, Pinia, and httpOnly cookie auth.</span
+            >One folder per domain (<code class="mono" style="font-size: 12px">Auth</code>,
+            <code class="mono" style="font-size: 12px">Users</code>,
+            <code class="mono" style="font-size: 12px">Ping</code>,
+            <code class="mono" style="font-size: 12px">Upload</code>). Add/remove without touching others.</span
           >
         </div>
         <div class="layer-row">
-          <span class="layer-name">API Controller</span>
+          <span class="layer-name">Contracts</span>
           <span class="layer-desc"
-            >Receives JSON, delegates to Service, returns JSON. Never touches a Model
-            directly.</span
+            ><code class="mono" style="font-size: 12px">Client + Contracts</code> — typed interfaces for
+            cross-module calls. Deptrac enforces: no direct Service/Model import.</span
           >
         </div>
         <div class="layer-row">
           <span class="layer-name">Service</span>
           <span class="layer-desc"
-            >Owns all business logic. Validates input, orchestrates Model calls, fires lifecycle
-            hooks.</span
+            >Business logic + validation + lifecycle hooks
+            <code class="mono" style="font-size: 12px">afterCreate/Update/Delete</code> (audit + WS
+            auto).</span
           >
         </div>
         <div class="layer-row">
-          <span class="layer-name">Transformer</span>
+          <span class="layer-name">Scaffold</span>
           <span class="layer-desc"
-            >Shapes and sanitizes payloads before they leave the API response layer.</span
-          >
-        </div>
-        <div class="layer-row">
-          <span class="layer-name">Model</span>
-          <span class="layer-desc"
-            >Extends <code class="mono" style="font-size: 12px">BaseModel</code> — soft delete,
-            search, and dateRange scopes included.</span
+            ><code class="mono" style="font-size: 12px">php spark make:module Posts --contract --fe</code>
+            — BE+FE wiring (Autoload + Services + router) in one command.</span
           >
         </div>
       </div>
@@ -202,24 +248,39 @@
 
       <div class="feature-grid">
         <div class="feature-cell">
+          <div class="feature-label">Modular</div>
+          <div class="feature-title">Folder-by-Feature</div>
+          <div class="feature-desc">
+            <span class="mono" style="font-size: 12px">app/Modules/Users</span> mirrors
+            <span class="mono" style="font-size: 12px">frontend/src/modules/users</span>. One feature = one folder.
+          </div>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-label">Contracts</div>
+          <div class="feature-title">Client / Contracts</div>
+          <div class="feature-desc">
+            Typed interfaces for cross-module calls — <span class="mono" style="font-size: 12px">service('userClient')</span>, never direct Model.
+          </div>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-label">Scaffold</div>
+          <div class="feature-title">make:module</div>
+          <div class="feature-desc">
+            <span class="mono" style="font-size: 12px">--contract --fe --minimal</span> flags. Autoload + Services + router wired automatically.
+          </div>
+        </div>
+        <div class="feature-cell">
+          <div class="feature-label">Enforcement</div>
+          <div class="feature-title">Deptrac</div>
+          <div class="feature-desc">
+            <span class="mono" style="font-size: 12px">composer analyse</span> — blocks illegal cross-module imports by file:line.
+          </div>
+        </div>
+        <div class="feature-cell">
           <div class="feature-label">Auth</div>
           <div class="feature-title">Shield Token Auth</div>
           <div class="feature-desc">
-            httpOnly cookie login for the SPA + Bearer header for API clients.
-          </div>
-        </div>
-        <div class="feature-cell">
-          <div class="feature-label">Filters</div>
-          <div class="feature-title">Layered Filter Stack</div>
-          <div class="feature-desc">
-            CORS, JSON body validation, API key guard — wired and ordered correctly.
-          </div>
-        </div>
-        <div class="feature-cell">
-          <div class="feature-label">Logging</div>
-          <div class="feature-title">Structured JSON Logs</div>
-          <div class="feature-desc">
-            Every log entry is a JSON line with timestamp, level, action, user ID, IP.
+            httpOnly <span class="mono" style="font-size: 12px">ck_token</span> for SPA + Bearer header for API clients.
           </div>
         </div>
         <div class="feature-cell">
@@ -230,45 +291,27 @@
           </div>
         </div>
         <div class="feature-cell">
-          <div class="feature-label">Upload</div>
-          <div class="feature-title">File Uploader</div>
+          <div class="feature-label">Optional</div>
+          <div class="feature-title">WebSocket <span class="optional-tag">opt-in</span></div>
           <div class="feature-desc">
-            Streaming upload via $file->move(). UUID filenames. Local and S3 drivers.
-          </div>
-        </div>
-        <div class="feature-cell">
-          <div class="feature-label">UI</div>
-          <div class="feature-title">Vue 3 SPA</div>
-          <div class="feature-desc">
-            Vite + Vue Router + Pinia + Tailwind, built via npm. Stateless server.
+            Ratchet broadcast via <span class="mono" style="font-size: 12px">WsPublisher</span> — no-op when <span class="mono" style="font-size: 12px">WS_ENABLED=false</span>.
           </div>
         </div>
         <div class="feature-cell">
           <div class="feature-label">Optional</div>
-          <div class="feature-title">SSO Layer <span class="optional-tag">opt-in</span></div>
-          <div class="feature-desc">
-            JWT RS256 cross-app authentication. Zero overhead when disabled.
-          </div>
+          <div class="feature-title">TUS Upload <span class="optional-tag">opt-in</span></div>
+          <div class="feature-desc">Resumable chunked uploads. <span class="mono" style="font-size: 12px">useTusUpload</span> composable included.</div>
         </div>
         <div class="feature-cell">
           <div class="feature-label">Optional</div>
-          <div class="feature-title">PDF Export <span class="optional-tag">opt-in</span></div>
-          <div class="feature-desc">Abstract base class for mPDF. One subclass per resource.</div>
-        </div>
-        <div class="feature-cell">
-          <div class="feature-label">Optional</div>
-          <div class="feature-title">
-            TUS Chunked Upload <span class="optional-tag">opt-in</span>
-          </div>
-          <div class="feature-desc">
-            Resumable uploads via TUS protocol. Pause, resume, and cleanup.
-          </div>
+          <div class="feature-title">SSO <span class="optional-tag">opt-in</span></div>
+          <div class="feature-desc">JWT RS256 cross-app auth. <span class="mono" style="font-size: 12px">SSOFilter</span> is pass-through when off.</div>
         </div>
         <div class="feature-cell">
           <div class="feature-label">Response</div>
           <div class="feature-title">Transformers</div>
           <div class="feature-desc">
-            Shape and sanitize API payloads before they leave the response layer.
+            Whitelist payloads via <span class="mono" style="font-size: 12px">BaseTransformer</span> — <span class="mono" style="font-size: 12px">item / collection / only / except</span>.
           </div>
         </div>
       </div>
@@ -289,21 +332,25 @@
 
 <span class="comment"># 3. Install dependencies</span>
 <span class="cmd">composer install</span>
-<span class="cmd">cd frontend &amp;&amp; npm install</span>
+<span class="cmd">cd frontend &amp;&amp; npm install &amp;&amp; cd ..</span>
 
-<span class="comment"># 4. Run migrations</span>
+<span class="comment"># 4. Run migrations + seed</span>
 <span class="cmd">php spark migrate --all</span>
-
-<span class="comment"># 5. Seed admin user</span>
 <span class="cmd">php spark db:seed AdminSeeder</span>
 
-<span class="comment"># 6. Build the SPA and start the dev server</span>
-<span class="cmd">cd frontend &amp;&amp; npm run build &amp;&amp; cd ..</span>
-<span class="cmd">php spark serve</span>
+<span class="comment"># 5. Scaffold a new resource (BE + FE)</span>
+<span class="cmd">php spark make:module Posts --contract --fe</span>
+<span class="comment"># → app/Modules/Posts/* + frontend/src/modules/posts/* wired</span>
 
-<span class="comment"># Open the web UI</span>
-<span class="highlight">http://localhost:8080/login</span>
-<span class="comment"># admin@example.com  |  password123</span></pre>
+<span class="comment"># 6. Verify boundaries + routes</span>
+<span class="cmd">composer analyse</span>  <span class="comment"># Deptrac — 0 violations</span>
+<span class="cmd">php spark routes</span>
+
+<span class="comment"># 7. Start dev (API :8080 + SPA :5173)</span>
+<span class="cmd">php spark serve</span>  <span class="comment"># terminal 1</span>
+<span class="cmd">cd frontend &amp;&amp; npm run dev</span>  <span class="comment"># terminal 2 → http://localhost:5173</span>
+
+<span class="comment"># login: admin@example.com | password123</span></pre>
       </div>
     </section>
 
@@ -319,9 +366,9 @@
         gap: 12px;
       "
     >
-      <span class="mono" style="font-size: 12px; color: #9ca3af">ci4-kit · MIT License</span>
+      <span class="mono" style="font-size: 12px; color: #9ca3af">ci-modular · MIT</span>
       <a
-        href="https://github.com/iskandar221201/codeigniter4-kit"
+        href="https://github.com/iskandar221201/ci-modular"
         target="_blank"
         style="
           font-size: 12px;
@@ -332,7 +379,7 @@
           gap: 6px;
         "
       >
-        iskandar221201/codeigniter4-kit
+        iskandar221201/ci-modular
       </a>
     </footer>
   </div>
