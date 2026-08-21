@@ -44,9 +44,6 @@ class Autoload extends AutoloadConfig
         'App\Modules\Ping'       => APPPATH . 'Modules/Ping',
         'App\Modules\Upload'     => APPPATH . 'Modules/Upload',
         'App\Shared'             => APPPATH . 'Shared',
-
-
-        'App\Modules\Posts' => APPPATH . 'Modules/Posts',
     ];
 
     /**
