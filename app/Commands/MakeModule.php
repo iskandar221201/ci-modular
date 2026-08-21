@@ -24,11 +24,12 @@ class MakeModule extends BaseCommand
     protected $name        = 'make:module';
     protected $description = 'Create a new module from _stubs/ templates';
 
-    protected $usage        = 'make:module <ModuleName> [--contract] [--minimal]';
+    protected $usage        = 'make:module <ModuleName> [--contract] [--minimal] [--fe]';
     protected $arguments    = ['ModuleName' => 'The module name, e.g. Posts'];
     protected $options      = [
         '--contract' => 'Include Client, Contracts and Config/Services layers.',
         '--minimal'  => 'Create Controller and Routes only.',
+        '--fe'       => 'Scaffold frontend module (views, store, service, composable, routes.js) + inject route.',
     ];
 
     public function run(array $params): void
@@ -42,6 +43,7 @@ class MakeModule extends BaseCommand
 
         $withContract = CLI::getOption('contract') !== null;
         $minimal      = CLI::getOption('minimal') !== null;
+        $withFe       = CLI::getOption('fe') !== null;
 
         $plural   = ucfirst($name);
         $singular = preg_replace('/s$/', '', $plural) ?: $plural;
@@ -112,6 +114,15 @@ class MakeModule extends BaseCommand
         if ($withContract && ! $minimal) {
             CLI::write('✓ Service forwarded     → app/Config/Services.php', 'green');
         }
+
+        // Scaffold frontend module for --fe
+        if ($withFe) {
+            $this->scaffoldFrontend($plural, $singular, $tokens);
+            $this->injectFrontendRoute($plural, $singular);
+            CLI::write('✓ FE module created     → frontend/src/modules/' . lcfirst($plural), 'green');
+            CLI::write('✓ FE route injected     → frontend/src/router/index.js', 'green');
+        }
+
         CLI::write("✓ Module created        → {$targetDir}" . ($minimal ? ' (minimal)' : ''), 'green');
     }
 
@@ -170,5 +181,99 @@ PHP;
         $code = substr($code, 0, $pos) . $forward . "\n" . substr($code, $pos);
 
         file_put_contents($path, $code);
+    }
+
+    private function scaffoldFrontend(string $plural, string $singular, array $tokens): void
+    {
+        $stubBase   = ROOTPATH . '_stubs/fe';
+        $targetBase = ROOTPATH . 'frontend/src/modules/' . lcfirst($plural);
+
+        if (is_dir($targetBase)) {
+            CLI::write("⚠ FE module already exists at {$targetBase} — skipped.", 'yellow');
+            return;
+        }
+
+        // Map: stub file relative path => target file relative path
+        $feTemplates = [
+            'routes.js'              => 'routes.js',
+            'services/stubApi.js'    => 'services/' . lcfirst($plural) . 'Api.js',
+            'stores/stub.js'         => 'stores/' . lcfirst($plural) . '.js',
+            'composables/useStub.js' => 'composables/use' . $plural . '.js',
+            'views/StubListView.vue' => 'views/' . $singular . 'ListView.vue',
+        ];
+
+        foreach ($feTemplates as $stubRel => $targetRel) {
+            $source = $stubBase . '/' . $stubRel;
+            if (! is_file($source)) {
+                CLI::error("FE stub missing: {$source}");
+                exit(EXIT_ERROR);
+            }
+
+            $content    = str_replace(array_keys($tokens), array_values($tokens), file_get_contents($source));
+            $targetFile = $targetBase . '/' . $targetRel;
+            $targetDir  = dirname($targetFile);
+
+            if (! is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+
+            if (file_put_contents($targetFile, $content) === false) {
+                CLI::error("Failed to write FE file: {$targetFile}");
+                exit(EXIT_ERROR);
+            }
+        }
+    }
+
+    private function injectFrontendRoute(string $plural, string $singular): void
+    {
+        $routerPath = ROOTPATH . 'frontend/src/router/index.js';
+
+        if (! is_file($routerPath)) {
+            CLI::error("Router file not found: {$routerPath}");
+            exit(EXIT_ERROR);
+        }
+
+        $code       = file_get_contents($routerPath);
+        $moduleName = lcfirst($plural);
+        $importName = $moduleName . 'Routes';
+        $importLine = "import {$importName} from '@/modules/{$moduleName}/routes.js'";
+
+        // Idempotency: skip if already injected
+        if (str_contains($code, $importLine)) {
+            CLI::write("⚠ FE route already injected for {$plural} — skipped.", 'yellow');
+            return;
+        }
+
+        // 1. Inject import after the last existing module route import
+        $importPattern = "/^import\s+\w+Routes\s+from\s+'@\/modules\/[^']+'\s*$/m";
+        preg_match_all($importPattern, $code, $matches, PREG_OFFSET_CAPTURE);
+
+        if (empty($matches[0])) {
+            CLI::error("Cannot locate module route imports in {$routerPath}");
+            exit(EXIT_ERROR);
+        }
+
+        $lastMatch = end($matches[0]);
+        $insertPos = $lastMatch[1] + strlen($lastMatch[0]);
+        $code      = substr($code, 0, $insertPos) . "\n" . $importLine . substr($code, $insertPos);
+
+        // 2. Inject spread after the last existing route spread entry
+        $spreadPattern = "/^\s+\.\.\.\w+Routes,\s*$/m";
+        preg_match_all($spreadPattern, $code, $spreadMatches, PREG_OFFSET_CAPTURE);
+
+        if (empty($spreadMatches[0])) {
+            CLI::error("Cannot locate route spread entries in {$routerPath}");
+            exit(EXIT_ERROR);
+        }
+
+        $lastSpread      = end($spreadMatches[0]);
+        $spreadInsert    = "\n  ...{$importName},";
+        $insertSpreadPos = $lastSpread[1] + strlen($lastSpread[0]);
+        $code            = substr($code, 0, $insertSpreadPos) . $spreadInsert . substr($code, $insertSpreadPos);
+
+        if (file_put_contents($routerPath, $code) === false) {
+            CLI::error("Failed to update {$routerPath}");
+            exit(EXIT_ERROR);
+        }
     }
 }

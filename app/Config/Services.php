@@ -28,10 +28,4 @@ class Services extends BaseService
     {
         return \App\Modules\Users\Config\Services::userClient($getShared);
     }
-
-
-    public static function postClient(bool $getShared = true): \App\Modules\Posts\Contracts\PostClientInterface
-    {
-        return \App\Modules\Posts\Config\Services::postClient($getShared);
-    }
 }
