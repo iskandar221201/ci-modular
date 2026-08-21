@@ -344,6 +344,14 @@ npm run analyze   # Bundle visualizer → stats.html
 
 ---
 
+## AI Prompt Templates (HITL)
+
+This kit includes the `.agents/hitl-rule` folder, which contains a collection of Human-in-the-Loop (HITL) prompt templates designed to assist AI agents (like GitHub Copilot, Claude, or other coding assistants) in understanding the strict architectural rules and standards of this project.
+
+These templates are maintained by the author of this kit and are part of the broader [hitl-work](https://github.com/iskandar221201/hitl-work) repository.
+
+---
+
 ## License
 
 MIT
