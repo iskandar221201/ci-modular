@@ -13,4 +13,24 @@ class {{MODULE}}Controller extends BaseApiController
     {
         return $this->success(null, 'OK');
     }
+
+    public function show($id): ResponseInterface
+    {
+        return $this->success(null, 'OK');
+    }
+
+    public function create(): ResponseInterface
+    {
+        return $this->success(null, 'Created', 201);
+    }
+
+    public function update($id): ResponseInterface
+    {
+        return $this->success(null, 'Updated');
+    }
+
+    public function delete($id): ResponseInterface
+    {
+        return $this->success(null, 'Deleted');
+    }
 }
