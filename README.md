@@ -50,9 +50,17 @@ The `Client/` + `Contracts/` layer keeps inter-module coupling explicit and swap
 php spark make:module Posts            # Controller, Model, Service, Transformer, Routes
 php spark make:module Posts --contract  # + Client, Contracts, Config/Services (inter-module access)
 php spark make:module Posts --minimal   # Controller + Routes only
+php spark make:module Posts --fe        # + Frontend module (views, store, service, composable, routes.js)
 ```
 
-The command registers the namespace in `Autoload.php` and wires the client service in `Config/Services.php` automatically. Frontend module structure (`views/`, `stores/`, `services/`, `composables/`, `routes.js`) mirrors the backend — same pattern, same names, no context switching.
+Flags are composable — `--fe` works alongside `--contract` and `--minimal`:
+
+```bash
+php spark make:module Posts --fe --contract   # Full BE + contract + full FE
+php spark make:module Posts --fe --minimal    # Minimal BE + full FE
+```
+
+The command registers the namespace in `Autoload.php`, wires the client service in `Config/Services.php` (for `--contract`), and auto-injects the import and route spread into `frontend/src/router/index.js` (for `--fe`). No manual wiring needed on either side.
 
 ---
 
@@ -238,6 +246,20 @@ frontend/src/
     └── services/api.js       # Axios — withCredentials, envelope unwrap, 401/422 handling
 
 _stubs/                       # Scaffold templates used by make:module
+├── Controllers/              # BE stubs
+├── Models/
+├── Services/
+├── Transformers/
+├── Client/
+├── Contracts/
+├── Config/
+├── Routes.php
+└── fe/                       # FE stubs (used by --fe flag)
+    ├── routes.js
+    ├── services/
+    ├── stores/
+    ├── composables/
+    └── views/
 ```
 
 ---
@@ -246,15 +268,15 @@ _stubs/                       # Scaffold templates used by make:module
 
 ```bash
 # 1. Scaffold
-php spark make:module Posts --contract
+php spark make:module Posts --contract --fe
 
 # 2. Migration
 php spark make:migration CreatePostsTable && php spark migrate
 
 # 3. Implement the generated stubs in app/Modules/Posts/
 
-# 4. Frontend — create frontend/src/modules/posts/ following the users/ reference
-#    routes.js gets imported once in router/index.js
+# 4. Customize the generated frontend in frontend/src/modules/posts/
+#    ListView, store, service, and route are ready — adjust columns and fields
 
 # 5. Verify
 php spark routes
