@@ -102,9 +102,10 @@ composer analyse
 ```
 
 Rules:
-- Modules may NOT import from another module's internal layers (Services, Models, Controllers, Transformers, Client).
-- Cross-module access must go through `Contracts/` interfaces only.
+- Modules may NOT import from another module's internal layers (Services, Models, Controllers, Transformers).
+- **Client is an implementation detail — never import it directly. Controllers talk to their own Service; cross-module access goes through `Contracts/` only. Deptrac enforces this.**
 - `Shared/` and `Libraries/` are accessible from any layer.
+- `Config/` acts as the DI container and is the only layer allowed to wire Contracts to concrete Clients.
 
 Violations are reported by file and line number. New violations fail the command.
 Known pre-existing violations are recorded in `deptrac.baseline.xml`.
