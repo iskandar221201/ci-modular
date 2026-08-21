@@ -12,6 +12,7 @@ use Config\AppConstants;
 abstract class BaseService
 {
     use AuditTrailTrait;
+
     /** @var string Must be set in the child class to bind a Model. */
     protected string $modelClass;
 
@@ -26,6 +27,21 @@ abstract class BaseService
         $this->validator = new BaseValidator();
     }
 
+    protected function rules(): array
+    {
+        return [];
+    }
+
+    protected function messages(): array
+    {
+        return [];
+    }
+
+    protected function updateRules(): array
+    {
+        return $this->rules();
+    }
+
     public function findAll(array $filters = [], int $perPage = AppConstants::DEFAULT_PER_PAGE): array
     {
         $search  = $filters['search'] ?? null;
@@ -37,17 +53,14 @@ abstract class BaseService
             $this->model->search($search);
         }
 
-        // Whitelist order direction to prevent SQL injection
         $allowedOrder = ['asc', 'desc'];
         $order        = in_array(strtolower($order), $allowedOrder, true) ? strtolower($order) : 'asc';
 
-        // Whitelist sort column against model's allowedFields to prevent SQL injection
         if ($sort !== null && $sort !== '') {
             $allowedSortFields = $this->model->allowedFields ?? [];
             if (in_array($sort, $allowedSortFields, true)) {
                 $this->model->orderBy($sort, $order);
             }
-            // If sort column is not in allowedFields, silently ignore it (no error, no injection)
         }
 
         if ($perPage > 0) {
@@ -59,7 +72,7 @@ abstract class BaseService
             log_message('debug', '[BaseService::findAll] Search keyword: ' . ($search ?? '(none)'));
 
             return [
-                'data'  => $data ?? [],   // FIX: paginate() returns null on empty result
+                'data'  => $data ?? [],
                 'pager' => $this->model->pager,
             ];
         }
@@ -76,6 +89,10 @@ abstract class BaseService
 
     public function create(array $data): int|string
     {
+        if (!empty($this->rules())) {
+            $this->validate($data, $this->rules(), $this->messages());
+        }
+
         $id = $this->model->insert($data, true);
 
         if ($id === false) {
@@ -95,11 +112,14 @@ abstract class BaseService
 
     public function update(int|string $id, array $data): mixed
     {
-        // FIX: check existence first so no-op updates don't false-404
         $old = $this->model->find($id);
 
         if (!$old) {
             throw new ServiceException('Record not found', AppConstants::HTTP_NOT_FOUND);
+        }
+
+        if (!empty($this->updateRules())) {
+            $this->validate($data, $this->updateRules(), $this->messages());
         }
 
         $result = $this->model->update($id, $data);
@@ -121,7 +141,6 @@ abstract class BaseService
 
     public function delete(int|string $id): bool
     {
-        // FIX: check existence first — soft delete doesn't reliably reflect in affectedRows()
         $old = $this->model->find($id);
 
         if (!$old) {
