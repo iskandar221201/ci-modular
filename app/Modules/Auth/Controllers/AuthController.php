@@ -55,7 +55,15 @@ class AuthController extends BaseApiController
 
     public function logout(): ResponseInterface
     {
-        $this->authService->logout($this->apiUser);
+        $token = $this->request->getCookie(env('AUTH_COOKIE_NAME', 'ck_token'));
+        if (empty($token)) {
+            $header = $this->request->getHeaderLine('Authorization');
+            if (str_starts_with($header, 'Bearer ')) {
+                $token = substr($header, 7);
+            }
+        }
+
+        $this->authService->logout($this->apiUser, $token);
 
         if ($this->apiUser !== null) {
             $this->logInfo('auth.logout', ['user_id' => $this->apiUser->id]);

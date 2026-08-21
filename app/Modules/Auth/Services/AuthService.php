@@ -92,15 +92,18 @@ class AuthService extends BaseService
     }
 
     /**
-     * Revoke the active access token (cookie-first, Bearer header fallback).
+     * Revoke the active access token.
+     *
+     * @param ?string $tokenString raw Shield token (cookie or Bearer, without prefix) — passed from Controller
      */
-    public function logout(?object $user): void
+    public function logout(?object $user, ?string $tokenString = null): void
     {
         if ($user === null) {
             return;
         }
 
-        $tokenString = service('request')->getCookie(env('AUTH_COOKIE_NAME', 'ck_token'));
+        // HTTP extraction moved to Controller; fallback kept for BC (old call without token)
+        $tokenString ??= service('request')->getCookie(env('AUTH_COOKIE_NAME', 'ck_token')) ?: null;
         if (empty($tokenString)) {
             $header = service('request')->getHeaderLine('Authorization');
             if (str_starts_with($header, 'Bearer ')) {
@@ -109,7 +112,11 @@ class AuthService extends BaseService
         }
 
         if (! empty($tokenString)) {
-            $user->revokeAccessToken($tokenString);
+            try {
+                $user->revokeAccessToken($tokenString);
+            } catch (\Throwable $e) {
+                log_message('warning', '[AuthService] revoke failed: ' . $e->getMessage());
+            }
         }
     }
 
